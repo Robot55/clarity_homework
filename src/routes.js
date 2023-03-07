@@ -75,6 +75,7 @@ router.post(`/employee`, async (req, res) => {
         });
         res.json(result);
     } catch (e) {
+        res.status(400)
         res.json({ message: ERROR_MSG, error: e });
     }
 });
@@ -152,6 +153,7 @@ router.put('/employee/:id', async (req, res) => {
             after_update: updatedEmployee,
         });
     } catch (e) {
+        res.status(400)
         res.json({ message: ERROR_MSG, error: e });
     }
 });
@@ -204,6 +206,7 @@ router.delete(`/employee/:id`, async (req, res) => {
         });
         res.json(employee);
     } catch (e) {
+        res.status(400)
         res.json({ message: ERROR_MSG, error: e });
     }
 });
@@ -261,6 +264,7 @@ router.get('/employees', async (req, res) => {
             });
             res.json(employees);
         } catch (e) {
+            res.status(400)
             res.json({ message: ERROR_MSG, error: e });
         }
     }
