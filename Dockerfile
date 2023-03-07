@@ -13,7 +13,7 @@ RUN npm install
 # add app source
 COPY . .
 
-#seed initial database
+#seed initial database (we will remoe this on production)
 RUN npx prisma migrate dev --name init
 
 #expose local port
