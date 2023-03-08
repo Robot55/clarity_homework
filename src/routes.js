@@ -1,7 +1,9 @@
+'use strict';
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient();
 
+const routify = require('../lib/createRoutePath');
 const ERROR_MSG = 'API call returned with error';
 
 const router = express.Router();
@@ -61,9 +63,8 @@ const router = express.Router();
  *               message: API call returned with error
  *               error: 'Error message'
  */
-router.post(`/employee`, async (req, res) => {
-    const { name, email, employment_start_date, job_id } = req.body;
-
+router.post(routify('employee'), async (req, res) => {
+    const {name, email, employment_start_date, job_id} = req.body;
     try {
         const result = await prisma.user.create({
             data: {
@@ -76,7 +77,7 @@ router.post(`/employee`, async (req, res) => {
         res.json(result);
     } catch (e) {
         res.status(400)
-        res.json({ message: ERROR_MSG, error: e });
+        res.json({message: ERROR_MSG, error: e.message});
     }
 });
 
@@ -138,13 +139,13 @@ router.post(`/employee`, async (req, res) => {
  *               message: API call returned with error
  *               error: 'Error message'
  */
-router.put('/employee/:id', async (req, res) => {
-    const { id } = req.params;
+router.put(routify('employee/:id'), async (req, res) => {
+    const {id} = req.params;
 
     try {
-        const employeeData = await prisma.user.findUnique({ where: { id: Number(id) } });
+        const employeeData = await prisma.user.findUnique({where: {id: Number(id)}});
         const updatedEmployee = await prisma.user.update({
-            where: { id: Number(id) || undefined },
+            where: {id: Number(id) || undefined},
             data: req.body,
         });
         res.json({
@@ -154,7 +155,68 @@ router.put('/employee/:id', async (req, res) => {
         });
     } catch (e) {
         res.status(400)
-        res.json({ message: ERROR_MSG, error: e });
+        res.json({message: ERROR_MSG, error: e.message});
+    }
+});
+
+/**
+ * @swagger
+ * /employee/{id}:
+ *   get:
+ *     summary: Get employee by ID
+ *     description: Retrieve employee data based on the provided ID.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID of the employee to retrieve.
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: OK. Returns the employee data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: The ID of the employee.
+ *                 name:
+ *                   type: string
+ *                   description: The name of the employee.
+ *                 email:
+ *                   type: string
+ *                   description: The email of the employee.
+ *                 role:
+ *                   type: string
+ *                   description: The role of the employee.
+ *       400:
+ *         description: Bad Request. The provided employee ID is invalid or not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message.
+ *                 error:
+ *                   type: string
+ *                   description: The error message returned by the API.
+ */
+router.get(routify('employee/:id'), async (req, res) => {
+    const {id} = req.params;
+
+    try {
+        const employeeData = await prisma.user.findUnique({where: {id: Number(id)}});
+        if (!employeeData) { throw new Error(`employee id: ${id} not found`.toString())}
+        res.json(employeeData)
+    } catch (e) {
+        res.status(400)
+        res.json({message: ERROR_MSG, error: e.message});
+        console.log(JSON.stringify(res))
     }
 });
 
@@ -195,8 +257,8 @@ router.put('/employee/:id', async (req, res) => {
  *               message: API call returned with error
  *               error: 'Error message'
  */
-router.delete(`/employee/:id`, async (req, res) => {
-    const { id } = req.params;
+router.delete(routify('employee/:id'), async (req, res) => {
+    const {id} = req.params;
 
     try {
         const employee = await prisma.user.delete({
@@ -207,7 +269,7 @@ router.delete(`/employee/:id`, async (req, res) => {
         res.json(employee);
     } catch (e) {
         res.status(400)
-        res.json({ message: ERROR_MSG, error: e });
+        res.json({message: ERROR_MSG, error: e.message});
     }
 });
 
@@ -249,8 +311,8 @@ router.delete(`/employee/:id`, async (req, res) => {
  *               message: API call returned with error
  *               error: 'Error message'
  */
-router.get('/employees', async (req, res) => {
-    const { role } = req.query;
+router.get(routify('employees'), async (req, res) => {
+    const {role} = req.query;
 
     if (!role || !Number(role)) {
         const employees = await prisma.user.findMany();
@@ -265,7 +327,7 @@ router.get('/employees', async (req, res) => {
             res.json(employees);
         } catch (e) {
             res.status(400)
-            res.json({ message: ERROR_MSG, error: e });
+            res.json({message: ERROR_MSG, error: e.message});
         }
     }
 });
@@ -302,7 +364,7 @@ router.get('/employees', async (req, res) => {
  *               message: API call returned with error
  *               error: 'Error message'
  */
-router.get('/roles', async (req, res) => {
+router.get(routify('roles'), async (req, res) => {
     const roles = await prisma.role.findMany();
     res.json(roles);
 });
