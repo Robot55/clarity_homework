@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clarity-homework
+  labels:
+    app: restaurant-api
+    tier: backend
+    environment: development
+    app.kubernetes.io/name: restaurant-api
+    app.kubernetes.io/component: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: restaurant-api-deployment
+  template:
+    metadata:
+      labels:
+        app: restaurant-api-deployment
+        tier: backend
+    spec:
+      containers:
+        - name: restaurant-api-application
+          image: docker.io/robot55/clarity-homework:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              hostPort: 40111
+              name: http

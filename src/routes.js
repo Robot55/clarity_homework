@@ -64,15 +64,9 @@ const router = express.Router();
  *               error: 'Error message'
  */
 router.post(routify('employee'), async (req, res) => {
-    const {name, email, employment_start_date, job_id} = req.body;
     try {
         const result = await prisma.user.create({
-            data: {
-                name,
-                email,
-                employment_start_date,
-                job_id,
-            },
+            data: req.body
         });
         res.json(result);
     } catch (e) {
@@ -165,6 +159,8 @@ router.put(routify('employee/:id'), async (req, res) => {
  *   get:
  *     summary: Get employee by ID
  *     description: Retrieve employee data based on the provided ID.
+ *     tags:
+ *      - Employee
  *     parameters:
  *       - name: id
  *         in: path
@@ -178,7 +174,7 @@ router.put(routify('employee/:id'), async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               type: object
+ *               $ref: '#/components/schemas/Employee'
  *               properties:
  *                 id:
  *                   type: integer
@@ -280,7 +276,7 @@ router.delete(routify('employee/:id'), async (req, res) => {
  *     summary: Get a list of employees
  *     description: Get a list of all employees, or filtered by job ID
  *     tags:
- *       - Employee
+ *       - Employees
  *     parameters:
  *       - in: query
  *         name: role

@@ -16,6 +16,10 @@ COPY . .
 #seed initial database (we will remoe this on production)
 RUN npx prisma migrate dev --name init
 
+#run tests
+RUN echo "running tests"
+CMD [ "npm", "test" ]
+
 #expose local port
 EXPOSE 3000
 

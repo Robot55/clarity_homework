@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon --inspect src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "test": "jest --runInBand --config jest.config.json"
   },
   "dependencies": {
     "@prisma/client": "4.11.0",
